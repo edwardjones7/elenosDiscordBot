@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:discordjs.guide)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:npmjs.com)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}

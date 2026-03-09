@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+data/*.db
+data/posted-articles.json
+*.js.map
+.claude/
