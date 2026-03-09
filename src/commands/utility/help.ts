@@ -31,10 +31,11 @@ export default {
         .setTitle(`${CATEGORY_LABELS[category]} Commands`);
 
       for (const cmd of cmds) {
-        embed.addFields({
-          name: `/${cmd.data.name}`,
-          value: cmd.data.description,
-        });
+        embed.addFields({ name: `/${cmd.data.name}`, value: cmd.data.description });
+      }
+
+      if (category === CommandCategory.AI) {
+        embed.addFields({ name: '@Elenos Bot', value: 'Mention the bot with any question and it will respond using AI.' });
       }
 
       return embed;

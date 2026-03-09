@@ -2,8 +2,7 @@ import { TextChannel } from 'discord.js';
 import { ExtendedClient } from '../types';
 import { getLatestArticles, markAsPosted } from '../services/news.service';
 import { claudeService } from '../services/claude.service';
-import { createNewsEmbed, createBaseEmbed } from '../utils/embed.builder';
-import { BRAND_COLOR } from '../config/constants';
+import { createNewsEmbed } from '../utils/embed.builder';
 import { config } from '../config';
 import { logger } from '../utils/logger';
 
@@ -23,37 +22,25 @@ export async function runTechNewsJob(client: ExtendedClient): Promise<void> {
 
   log.info('Running tech news job');
 
-  const articles = await getLatestArticles(5);
+  const articles = await getLatestArticles(1);
 
   if (articles.length === 0) {
     log.info('No new articles found');
     return;
   }
 
-  // Header embed
-  await channel.send({
-    embeds: [
-      createBaseEmbed(BRAND_COLOR)
-        .setTitle('📰 Latest Tech News')
-        .setDescription(`Here are **${articles.length}** fresh stories from around the tech world:`),
-    ],
-  });
+  const article = articles[0];
+  try {
+    const summary = await claudeService.summarizeArticle(
+      article.title,
+      article.url,
+      article.summary,
+    );
 
-  for (const article of articles) {
-    try {
-      const summary = await claudeService.summarizeArticle(
-        article.title,
-        article.url,
-        article.summary,
-      );
-
-      await channel.send({ embeds: [createNewsEmbed(article, summary)] });
-
-      // Small delay to avoid rate limits
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    } catch (err) {
-      log.error({ err, url: article.url }, 'Failed to post article');
-    }
+    await channel.send({ embeds: [createNewsEmbed(article, summary)] });
+  } catch (err) {
+    log.error({ err, url: article.url }, 'Failed to post article');
+    return;
   }
 
   markAsPosted(articles);

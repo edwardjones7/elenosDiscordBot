@@ -7,30 +7,30 @@ import { BRAND_COLOR, AI_COOLDOWN_SECONDS } from '../../config/constants';
 export default {
   data: new SlashCommandBuilder()
     .setName('summarize')
-    .setDescription('Summarize a URL or text with AI')
+    .setDescription('Summarize an article by URL')
     .addStringOption((opt) =>
-      opt.setName('input').setDescription('URL or text to summarize').setRequired(true).setMaxLength(1000),
+      opt.setName('url').setDescription('URL of the article to summarize').setRequired(true),
     ),
   category: CommandCategory.AI,
   cooldown: AI_COOLDOWN_SECONDS,
   async execute(interaction: ChatInputCommandInteraction, _client: ExtendedClient): Promise<void> {
     await interaction.deferReply();
 
-    const input = interaction.options.getString('input', true);
-    const isUrl = /^https?:\/\//i.test(input);
+    const url = interaction.options.getString('url', true);
 
-    const summary = await claudeService.summarizeArticle(
-      isUrl ? 'Article' : 'Text',
-      isUrl ? input : '',
-      isUrl ? '' : input,
-    );
+    if (!/^https?:\/\//i.test(url)) {
+      await interaction.editReply('Please provide a valid URL starting with `http://` or `https://`.');
+      return;
+    }
+
+    const summary = await claudeService.summarizeArticle('Article', url, '');
 
     await interaction.editReply({
       embeds: [
         createBaseEmbed(BRAND_COLOR)
-          .setTitle('Summary')
+          .setTitle('Article Summary')
           .setDescription(summary)
-          .addFields({ name: 'Input', value: input.slice(0, 100) + (input.length > 100 ? '...' : '') }),
+          .addFields({ name: 'URL', value: url }),
       ],
     });
   },

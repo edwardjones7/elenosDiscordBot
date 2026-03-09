@@ -19,6 +19,8 @@ export const config = {
   },
   channels: {
     techNews: process.env.TECH_NEWS_CHANNEL_ID,
+    cryptoNews: process.env.CRYPTO_NEWS_CHANNEL_ID,
+    stockNews: process.env.STOCK_NEWS_CHANNEL_ID,
     modLogs: process.env.MOD_LOGS_CHANNEL_ID,
     welcome: process.env.WELCOME_CHANNEL_ID,
   },
@@ -29,7 +31,7 @@ export const config = {
   },
   news: {
     apiKey: process.env.NEWSAPI_KEY,
-    postInterval: process.env.NEWS_POST_INTERVAL ?? '0 */2 * * *',
+    postInterval: process.env.NEWS_POST_INTERVAL ?? '0 * * * *',
     weeklyDigestSchedule: process.env.WEEKLY_DIGEST_SCHEDULE ?? '0 9 * * 1',
   },
   app: {

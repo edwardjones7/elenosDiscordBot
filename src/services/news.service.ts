@@ -1,7 +1,7 @@
 import { db } from '../utils/database';
 import { fetchFeed } from './rss.service';
 import { fetchTopTech } from './newsapi.service';
-import { RSS_FEEDS } from '../data/rss-feeds';
+import { RSS_FEEDS, RssFeed } from '../data/rss-feeds';
 import { NewsArticle } from '../types';
 import { NEWS_FETCH_HOURS_BACK } from '../config/constants';
 import { logger } from '../utils/logger';
@@ -62,4 +62,27 @@ export function markAsPosted(articles: NewsArticle[]): void {
 
 export function getPostedSince(since: Date): Array<{ url: string; title: string }> {
   return getRecentPosted.all(since.getTime()) as Array<{ url: string; title: string }>;
+}
+
+export async function getArticlesFromFeeds(feeds: RssFeed[], limit = 1): Promise<NewsArticle[]> {
+  const cutoff = new Date(Date.now() - NEWS_FETCH_HOURS_BACK * 60 * 60 * 1000);
+
+  const results = await Promise.allSettled(feeds.map((f) => fetchFeed(f.name, f.url)));
+  const allArticles: NewsArticle[] = [];
+  for (const result of results) {
+    if (result.status === 'fulfilled') allArticles.push(...result.value);
+  }
+
+  const seen = new Set<string>();
+  const fresh = allArticles
+    .filter((a) => {
+      if (seen.has(a.url)) return false;
+      seen.add(a.url);
+      return true;
+    })
+    .filter((a) => a.publishedAt >= cutoff)
+    .filter((a) => !isPosted.get(a.url))
+    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+
+  return fresh.slice(0, limit);
 }

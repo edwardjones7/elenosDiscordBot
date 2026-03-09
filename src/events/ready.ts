@@ -11,7 +11,7 @@ export default {
   execute(client: ExtendedClient): void {
     log.info(`Logged in as ${client.user?.tag} | ${client.guilds.cache.size} guild(s)`);
 
-    client.user?.setActivity('elenos.dev | /help', { type: ActivityType.Watching });
+    client.user?.setActivity('elenos.ai | /help', { type: ActivityType.Watching });
 
     registerJobs(client);
   },
