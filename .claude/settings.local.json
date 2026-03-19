@@ -8,7 +8,10 @@
       "Bash(npm install:*)",
       "Bash(mkdir:*)",
       "Bash(npx tsc:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run:*)",
+      "Bash(sshpass:*)",
+      "Bash(wsl --list --quiet)"
     ]
   }
 }

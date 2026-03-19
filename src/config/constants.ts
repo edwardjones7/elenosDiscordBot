@@ -1,11 +1,11 @@
-export const BRAND_COLOR = 0x0055ff;
+export const BRAND_COLOR = 0xa200ff;
 export const SUCCESS_COLOR = 0x00c851;
 export const ERROR_COLOR = 0xff4444;
 export const WARNING_COLOR = 0xffbb33;
 export const INFO_COLOR = 0x33b5e5;
 
 export const BOT_NAME = 'Elenos Bot';
-export const BOT_FOOTER = 'Elenos Software Agency • elenos.ai';
+export const BOT_FOOTER = 'Elenos AI • elenos.ai';
 
 export const DEFAULT_COOLDOWN_SECONDS = 3;
 export const AI_COOLDOWN_SECONDS = 30;

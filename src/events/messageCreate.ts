@@ -14,8 +14,8 @@ export default {
   async execute(message: Message, client: ExtendedClient): Promise<void> {
     if (message.author.bot || !message.guild) return;
 
-    // Respond when the bot is @mentioned
-    if (client.user && message.mentions.has(client.user)) {
+    // Respond only when the bot is directly @mentioned (not @everyone / @here)
+    if (client.user && message.mentions.users.has(client.user.id)) {
       const prompt = message.content.replace(`<@${client.user.id}>`, '').trim();
       if (prompt) {
         await message.channel.sendTyping().catch(() => null);

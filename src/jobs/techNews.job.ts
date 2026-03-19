@@ -2,6 +2,7 @@ import { TextChannel } from 'discord.js';
 import { ExtendedClient } from '../types';
 import { getLatestArticles, markAsPosted } from '../services/news.service';
 import { claudeService } from '../services/claude.service';
+import { fetchArticleContent } from '../utils/article-fetcher';
 import { createNewsEmbed } from '../utils/embed.builder';
 import { config } from '../config';
 import { logger } from '../utils/logger';
@@ -31,10 +32,11 @@ export async function runTechNewsJob(client: ExtendedClient): Promise<void> {
 
   const article = articles[0];
   try {
+    const content = await fetchArticleContent(article.url);
     const summary = await claudeService.summarizeArticle(
       article.title,
       article.url,
-      article.summary,
+      content ?? article.summary,
     );
 
     await channel.send({ embeds: [createNewsEmbed(article, summary)] });

@@ -2,6 +2,7 @@ import { TextChannel } from 'discord.js';
 import { ExtendedClient } from '../types';
 import { getArticlesFromFeeds, markAsPosted } from '../services/news.service';
 import { claudeService } from '../services/claude.service';
+import { fetchArticleContent } from '../utils/article-fetcher';
 import { createNewsEmbed } from '../utils/embed.builder';
 import { CRYPTO_FEEDS } from '../data/rss-feeds';
 import { config } from '../config';
@@ -32,7 +33,8 @@ export async function runCryptoNewsJob(client: ExtendedClient): Promise<void> {
 
   const article = articles[0];
   try {
-    const summary = await claudeService.summarizeArticle(article.title, article.url, article.summary);
+    const content = await fetchArticleContent(article.url);
+    const summary = await claudeService.summarizeArticle(article.title, article.url, content ?? article.summary);
     await channel.send({ embeds: [createNewsEmbed(article, summary)] });
   } catch (err) {
     log.error({ err, url: article.url }, 'Failed to post crypto article');

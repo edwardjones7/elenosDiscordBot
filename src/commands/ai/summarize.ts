@@ -1,13 +1,14 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command, CommandCategory, ExtendedClient } from '../../types';
 import { claudeService } from '../../services/claude.service';
+import { fetchArticleContent } from '../../utils/article-fetcher';
 import { createBaseEmbed } from '../../utils/embed.builder';
 import { BRAND_COLOR, AI_COOLDOWN_SECONDS } from '../../config/constants';
 
 export default {
   data: new SlashCommandBuilder()
     .setName('summarize')
-    .setDescription('Summarize an article by URL')
+    .setDescription('Fetch and break down an article by URL')
     .addStringOption((opt) =>
       opt.setName('url').setDescription('URL of the article to summarize').setRequired(true),
     ),
@@ -23,15 +24,18 @@ export default {
       return;
     }
 
-    const summary = await claudeService.summarizeArticle('Article', url, '');
+    const content = await fetchArticleContent(url);
+    const breakdown = await claudeService.breakdownArticle('Article', url, content ?? '');
 
-    await interaction.editReply({
-      embeds: [
-        createBaseEmbed(BRAND_COLOR)
-          .setTitle('Article Summary')
-          .setDescription(summary)
-          .addFields({ name: 'URL', value: url }),
-      ],
-    });
+    const embed = createBaseEmbed(BRAND_COLOR)
+      .setTitle('Article Breakdown')
+      .setDescription(breakdown)
+      .addFields({ name: 'Source', value: url });
+
+    if (!content) {
+      embed.setFooter({ text: 'Note: could not fetch full article content — breakdown based on URL only.' });
+    }
+
+    await interaction.editReply({ embeds: [embed] });
   },
 } satisfies Command;
